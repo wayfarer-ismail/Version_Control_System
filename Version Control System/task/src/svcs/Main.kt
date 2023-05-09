@@ -5,6 +5,8 @@ fun main(args: Array<String>) {
         Commands.help()
         return
     } else {
+        Startup.init() // create the vcs directory and the config.txt and index.txt files
+
         when(args[0]) {
             "config" -> Commands.config(args)
             "add" -> Commands.add(args)

@@ -22,30 +22,39 @@ class Commands {
         }
 
         fun config(args: Array<String>) {
-            initConfig()
+            val configFile = getFile("config.txt")
 
-            val name: String = if (args.size == 1) {
-                println("Please, tell me who you are.")
-                readln()
+            if (args.size == 1) {
+
+                if (configFile.readText().isEmpty()) {
+                    println("Please, tell me who you are.")
+                } else {
+                    println("The username is ${configFile.readText()}.")
+                }
             } else {
-                args[1]
+                configFile.writeText(args[1])
+                println("The username is ${args[1]}.")
             }
 
-            println("The username is $name.")
         }
 
-        private fun initConfig() {
+        private fun getFile(fileName: String): File {
             val workingDir = System.getProperty("user.dir")
-            val path = "${workingDir}${sprtr}vcs${sprtr}config.txt"
-            val file = File(path)
-            if (!file.exists()) {
-                File("vcs").mkdir()
-                file.createNewFile()
-            }
+            val path = "${workingDir}${sprtr}vcs${sprtr}${fileName}"
+            return File(path)
         }
+
 
         fun add(args: Array<String>) {
-            println("Add a file to the index.")
+
+            if (args.size == 1) {
+                println("Add a file to the index.")
+            } else {
+                val fileName = args[1]
+
+                println("The File '$fileName' is tracked.")
+            }
+
         }
 
         fun log(args: Array<String>) {
