@@ -1,11 +1,15 @@
 package svcs
 
+import java.io.File
+
 class Commands {
 
     /*
     * a static function that prints the help message.
      */
     companion object {
+        private val sprtr = File.separator
+
         fun help() {
             println("""
                 These are SVCS commands:
@@ -18,7 +22,26 @@ class Commands {
         }
 
         fun config(args: Array<String>) {
-            println("Get and set a username.")
+            initConfig()
+
+            val name: String = if (args.size == 1) {
+                println("Please, tell me who you are.")
+                readln()
+            } else {
+                args[1]
+            }
+
+            println("The username is $name.")
+        }
+
+        private fun initConfig() {
+            val workingDir = System.getProperty("user.dir")
+            val path = "${workingDir}${sprtr}vcs${sprtr}config.txt"
+            val file = File(path)
+            if (!file.exists()) {
+                File("vcs").mkdir()
+                file.createNewFile()
+            }
         }
 
         fun add(args: Array<String>) {
