@@ -46,13 +46,25 @@ class Commands {
 
 
         fun add(args: Array<String>) {
+            val indexFile = getFile("index.txt")
 
             if (args.size == 1) {
-                println("Add a file to the index.")
+                if (indexFile.readText().isEmpty()) {
+                    println("Add a file to the index.")
+                } else {
+                    println("Tracked files:")
+                    println(indexFile.readText())
+                }
             } else {
                 val fileName = args[1]
+                val file = File(fileName)
 
-                println("The File '$fileName' is tracked.")
+                if (!file.exists()) {
+                    println("Can't find '${args[1]}'.")
+                } else {
+                    indexFile.appendText(fileName + "\n")
+                    println("The File '$fileName' is tracked.")
+                }
             }
 
         }

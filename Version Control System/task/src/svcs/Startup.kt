@@ -10,21 +10,14 @@ class Startup {
         fun init() {
 
             val path = "${workingDir}${sprtr}vcs"
-            val file = File(path)
-            if (!file.exists()) {
-                file.mkdir()
+            val dir = File(path)
+            if (!dir.exists()) {
+                dir.mkdir()
             }
-            
-            createFile("${workingDir}${sprtr}vcs${sprtr}config.txt")
 
-            createFile("${workingDir}${sprtr}vcs${sprtr}index.txt")
+            dir.resolve("config.txt").createNewFile()
+            dir.resolve("index.txt").createNewFile()
         }
 
-        private fun createFile(path: String) {
-            val file = File(path)
-            if (!file.exists()) {
-                file.createNewFile()
-            }
-        }
     }
 }
