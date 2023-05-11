@@ -39,9 +39,12 @@ class Commands {
         }
 
         private fun getFile(fileName: String): File {
-            val workingDir = System.getProperty("user.dir")
-            val path = "${workingDir}${sprtr}vcs${sprtr}${fileName}"
-            return File(path)
+            val workingDir = File(System.getProperty("user.dir"))
+            return if (workingDir.resolve(fileName).exists()) {
+                workingDir.resolve(fileName)
+            } else {
+                workingDir.resolve("vcs").resolve(fileName)
+            }
         }
 
 
@@ -76,7 +79,7 @@ class Commands {
                 if (logFile.readText().isEmpty()) {
                     println("No commits yet.")
                 } else {
-                    println(logFile.readText().split("\n\n").reversed().joinToString("\n").trim())
+                    println(logFile.readText().split("\n\n").reversed().joinToString("\n\n").trim())
                 }
             } else {
                 println("Incorrect parameters.")
@@ -90,21 +93,35 @@ class Commands {
             } else {
                 val message:String = args[1]
 
-                //add commit info to log
-                val logFile = getFile("log.txt")
-                val commitInfo = """
-                    commit ${message.length}
-                    Author: ${getFile("config.txt").readText()}
-                    $message
-                """.trimIndent()
-                logFile.appendText(commitInfo + "\n")
+                //calculate hash of commit files
+                val indexFile = getFile("index.txt")
+                val commitFiles = indexFile.readText().split("\n").dropLast(1) //drop last empty line
+                val commitHash = commitFiles.joinToString("") { getFile(it).readText() }.hashCode()
 
                 //save changes to commit directory
                 val commitDir = getFile("commits")
 
-                commitDir.resolve(message).mkdir()
+                if (commitDir.resolve(commitHash.toString()).isDirectory) {
+                    println("Nothing to commit.")
 
-                println("Changes are committed.")
+                } else {
+                    commitDir.resolve(commitHash.toString()).mkdir()
+                    commitFiles.forEach {
+                        val file = File(it)
+                        file.copyTo(commitDir.resolve(commitHash.toString()).resolve(it))
+                    }
+
+                    //add commit info to log
+                    val logFile = getFile("log.txt")
+                    val commitInfo = """
+                        commit $commitHash
+                        Author: ${getFile("config.txt").readText()}
+                        $message
+                    """.trimIndent()
+                    logFile.appendText(commitInfo + "\n\n")
+
+                    println("Changes are committed.")
+                }
             }
         }
 
