@@ -70,11 +70,42 @@ class Commands {
         }
 
         fun log(args: Array<String>) {
-            println("Show commit logs.")
+            val logFile = getFile("log.txt")
+
+            if (args.size == 1) {
+                if (logFile.readText().isEmpty()) {
+                    println("No commits yet.")
+                } else {
+                    println(logFile.readText().split("\n\n").reversed().joinToString("\n").trim())
+                }
+            } else {
+                println("Incorrect parameters.")
+            }
         }
 
         fun commit(args: Array<String>) {
-            println("Save changes.")
+
+            if (args.size < 2) {
+                println("Message was not passed.")
+            } else {
+                val message:String = args[1]
+
+                //add commit info to log
+                val logFile = getFile("log.txt")
+                val commitInfo = """
+                    commit ${message.length}
+                    Author: ${getFile("config.txt").readText()}
+                    $message
+                """.trimIndent()
+                logFile.appendText(commitInfo + "\n")
+
+                //save changes to commit directory
+                val commitDir = getFile("commits")
+
+                commitDir.resolve(message).mkdir()
+
+                println("Changes are committed.")
+            }
         }
 
         fun checkout(args: Array<String>) {
