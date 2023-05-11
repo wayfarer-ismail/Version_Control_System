@@ -14,7 +14,7 @@ fun main(args: Array<String>) {
             "commit" -> Commands.commit(args)
             "checkout" -> Commands.checkout(args)
             "--help" -> Commands.help()
-            else -> Error.invalidCommand(args[0])
+            else -> println("'${args[0]}' is not a SVCS command.")
         }
     }
 }

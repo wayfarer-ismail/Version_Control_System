@@ -4,11 +4,11 @@ import java.io.File
 
 class Commands {
 
-    /*
-    * a static function that prints the help message.
-     */
     companion object {
-        private val sprtr = File.separator
+        private val configFile = getFile("config.txt")
+        private val indexFile = getFile("index.txt")
+        private val logFile = getFile("log.txt")
+        private val commitDir = getFile("commits")
 
         fun help() {
             println("""
@@ -22,10 +22,7 @@ class Commands {
         }
 
         fun config(args: Array<String>) {
-            val configFile = getFile("config.txt")
-
             if (args.size == 1) {
-
                 if (configFile.readText().isEmpty()) {
                     println("Please, tell me who you are.")
                 } else {
@@ -35,7 +32,6 @@ class Commands {
                 configFile.writeText(args[1])
                 println("The username is ${args[1]}.")
             }
-
         }
 
         private fun getFile(fileName: String): File {
@@ -47,10 +43,7 @@ class Commands {
             }
         }
 
-
         fun add(args: Array<String>) {
-            val indexFile = getFile("index.txt")
-
             if (args.size == 1) {
                 if (indexFile.readText().isEmpty()) {
                     println("Add a file to the index.")
@@ -69,12 +62,9 @@ class Commands {
                     println("The File '$fileName' is tracked.")
                 }
             }
-
         }
 
         fun log(args: Array<String>) {
-            val logFile = getFile("log.txt")
-
             if (args.size == 1) {
                 if (logFile.readText().isEmpty()) {
                     println("No commits yet.")
@@ -87,24 +77,21 @@ class Commands {
         }
 
         fun commit(args: Array<String>) {
-
             if (args.size < 2) {
                 println("Message was not passed.")
             } else {
                 val message:String = args[1]
 
                 //calculate hash of commit files
-                val indexFile = getFile("index.txt")
                 val commitFiles = indexFile.readText().split("\n").dropLast(1) //drop last empty line
                 val commitHash = commitFiles.joinToString("") { getFile(it).readText() }.hashCode()
 
-                //save changes to commit directory
-                val commitDir = getFile("commits")
-
+                //check if commit already exists
                 if (commitDir.resolve(commitHash.toString()).isDirectory) {
                     println("Nothing to commit.")
 
                 } else {
+                    //save changes to commit directory
                     commitDir.resolve(commitHash.toString()).mkdir()
                     commitFiles.forEach {
                         val file = File(it)
@@ -112,7 +99,6 @@ class Commands {
                     }
 
                     //add commit info to log
-                    val logFile = getFile("log.txt")
                     val commitInfo = """
                         commit $commitHash
                         Author: ${getFile("config.txt").readText()}
@@ -129,5 +115,4 @@ class Commands {
             println("Restore a file.")
         }
     }
-
 }
