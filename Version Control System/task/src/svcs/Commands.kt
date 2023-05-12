@@ -112,7 +112,21 @@ class Commands {
         }
 
         fun checkout(args: Array<String>) {
-            println("Restore a file.")
+            if (args.size < 2) {
+                println("Commit id was not passed.")
+            } else {
+                val commitHash = args[1]
+                val checkoutDir = commitDir.resolve(commitHash)
+
+                if (checkoutDir.isDirectory) {
+                    checkoutDir.listFiles().forEach {
+                        it.copyTo(File(it.name), true)
+                    }
+                    println("Switched to commit $commitHash.")
+                } else {
+                    println("Commit does not exist.")
+                }
+            }
         }
     }
 }
